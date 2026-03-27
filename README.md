@@ -106,13 +106,35 @@ uv run python run_v3.py
 
 ## Prior Art and Related Work
 
-- **Barvinok (2016)**: [Combinatorics and Complexity of Partition Functions](https://link.springer.com/book/10.1007/978-3-319-51829-9) — established that partition function zero-free regions enable efficient approximation algorithms. Applied to permanents, matchings, graph homomorphisms — but not TSP.
-- **Mézard & Parisi (1986)**: Mean-field theory of the random TSP via the replica method — statistical mechanics of TSP, but only at real temperature.
-- **Sokal (2001)**: Chromatic roots are dense in the whole complex plane — Lee-Yang theory for graph coloring, the closest combinatorial analog.
-- **Kirkpatrick et al. (1983)**: Simulated annealing for optimization — implicitly uses the TSP partition function but never analyzes it in the complex plane.
+### Statistical mechanics of TSP (real temperature only)
 
-To our knowledge, **no prior work has computed, visualized, or analyzed the zeros of the TSP partition function in the complex inverse-temperature plane.**
+- **Kirkpatrick, Gelatt & Vecchi (1983)**: [Optimization by Simulated Annealing](https://www.science.org/doi/10.1126/science.220.4598.671) — the founding paper connecting statistical mechanics to TSP. Defines the Boltzmann distribution over tours and uses Metropolis sampling. Treats β as a real annealing parameter, never complexified.
+- **Mézard & Parisi (1986)**: [Mean-field theory of random TSP](https://iopscience.iop.org/article/10.1209/0295-5075/2/12/005) via the replica method. Computed the ground-state tour length (~2.04 in mean-field limit). Full temperature dependence studied, but always with real β.
+- **Vannimenus & Mézard (1984)**: [Statistical mechanics of TSP](https://link.springer.com/article/10.1007/BF01033073) — showed spontaneous symmetry breaking at any nonzero temperature.
+
+### Lee-Yang zeros for combinatorial problems (not TSP)
+
+- **Barvinok (2016)**: [Combinatorics and Complexity of Partition Functions](https://link.springer.com/book/10.1007/978-3-319-51829-9) — the key insight that partition function zero-free regions yield efficient approximation algorithms. Applied to permanents, matchings, graph homomorphisms, independence polynomials — but not cost-weighted TSP.
+- **Patel & Regts (2017)**: [Deterministic polynomial-time approximation](https://epubs.siam.org/doi/10.1137/16M1101003) for graph polynomials on bounded-degree graphs via zero-freeness. Extended Barvinok's program.
+- **Sokal (2001)**: Chromatic roots are dense in the whole complex plane — Lee-Yang theory for graph coloring.
+- **Liu, Sinclair & Srivastava (2019)**: [Correlation decay implies zero-freeness](https://epubs.siam.org/doi/10.1137/20M1317384) — connected spatial mixing to partition function zeros.
+
+### Closest existing work
+
+- **Walrad (2021)**: [Approximating the partition function of Hamiltonian cycles](https://lsa.umich.edu/content/dam/math-assets/math-document1/reu-documents/J-Walrad_REU21.pdf) — Michigan REU under Barvinok. Attempted to apply zero-free methods to count (unweighted) Hamiltonian cycles. This is the closest work to ours, but it counts cycles rather than weighting by tour cost, and does not compute or visualize the zeros themselves.
+- **Sly (2010)**: [Computational transition at the uniqueness threshold](https://arxiv.org/abs/1005.5584) — proved that phase transitions in spin systems exactly predict computational hardness boundaries. The analog for TSP remains unexplored.
+- **Percus, Istrate & Moore (2006)**: [Computational Complexity and Statistical Physics](https://global.oup.com/academic/product/computational-complexity-and-statistical-physics-9780195177381) — standard reference on phase transitions in combinatorial optimization, but does not treat complex-temperature zeros.
+
+### The gap
+
+To our knowledge, **no prior work has:**
+1. Computed the zeros of Z(β) = Σ exp(−β · cost(T)) for the TSP with complex β
+2. Visualized the magnitude landscape of the TSP partition function in the complex plane
+3. Used the zero distribution to characterize or classify TSP instances
+4. Connected the Fisher zero structure of Z_TSP(β) to energy landscape topology
+
+The statistical mechanics community has TSP at real temperature. The TCS/combinatorics community has zero-based algorithms for graph polynomials. This work connects them for the first time.
 
 ---
 
-*Generated with Claude. Computations performed on Apple Silicon using NumPy.*
+*Built with Claude. Computations on Apple Silicon using NumPy. Literature survey confirmed novelty via comprehensive search across arXiv, SIAM, Springer, and Google Scholar.*
