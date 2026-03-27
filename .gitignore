@@ -1,0 +1,6 @@
+output/*.png
+__pycache__/
+.venv/
+*.egg-info/
+run.py
+run_v2.py
