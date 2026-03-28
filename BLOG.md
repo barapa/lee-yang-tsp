@@ -1,125 +1,111 @@
-# I Sent an AI to Do Science While I Watched a Movie. Here's What It Found (and Didn't).
+# Tokens Spent, Null Result Found: Lee-Yang Zeros of the TSP Partition Function
 
-*An honest account of computational novelty, beautiful visualizations, and a null result.*
+I had some tokens. I went to see Project Hail Mary (very good). While I was gone, Claude spent those tokens investigating whether a physics technique from the 1950s reveals hidden structure in the Traveling Salesman Problem. It built a project, generated novel visualizations, got excited, challenged itself, ran a null model experiment, and found that the answer is mostly no. The whole thing took one evening. Publishing is free, so here it is. Maybe another agent or researcher will find it useful someday. Maybe not.
+
+The full conversation, code, and images are at [github.com/barapa/lee-yang-tsp](https://github.com/barapa/lee-yang-tsp).
 
 ---
 
-It started with a genuinely idle question I asked Claude: *"Is there a term for the reverse traveling salesman problem where instead of trying to find the shortest path that hits every stop, you're trying to find the longest path?"*
+## How this started
 
-There is — it's called Max-TSP. We talked about how the two problems are computationally equivalent but have different approximation properties (Max-TSP is actually easier to approximate, which is counterintuitive). Then I asked: *"Are there versions of the problem with both negative and positive weights?"* Yes — and those are essentially inapproximable. Then, on a whim: *"Are there versions of the problem with imaginary components to their weights?"*
+I was chatting with Claude about TSP variants. I asked whether there's a name for the "reverse" traveling salesman problem where you want the *longest* route instead of the shortest (there is: Max-TSP). We talked about versions with negative weights (inapproximable). Then I asked a question I had no business asking:
 
-That's where things got interesting, because complex weights connect to statistical physics.
+*"Are there versions of the problem with imaginary components to their weights?"*
 
-## The idea
+The answer connected to statistical physics in a way I didn't expect, so let me explain the pieces.
 
-In 1952, T.D. Lee and C.N. Yang published a theorem about phase transitions in magnetic systems. The insight, which later won them a Nobel Prize, was that you could understand a system's critical behavior by looking at where its partition function hits zero in the complex plane. These "Lee-Yang zeros" have been studied for spin models, lattice gases, graph coloring — but never for the Traveling Salesman Problem.
+## What's a partition function and why would you care
 
-The TSP partition function is:
+In statistical mechanics, a **partition function** is a single number that encodes everything about a physical system at a given temperature. For a system with a bunch of possible states, each with some energy E, the partition function is:
 
-> Z(beta) = sum over all tours T of exp(-beta * cost(T))
+Z(β) = Σ exp(-β × E)
 
-When beta is real, this is just the Boltzmann distribution from simulated annealing. But make beta complex and you get a function on the complex plane, complete with zeros that might tell you something about the problem's structure.
+where β is the inverse temperature (low β = hot, high β = cold) and the sum runs over every possible state. At high temperature, all states contribute roughly equally. At low temperature, only the lowest-energy states matter. The partition function captures this tradeoff.
 
-I asked: *"Do you have any incredible speculative ideas in this area? Something that hasn't been discovered yet?"* Claude proposed four speculative research directions. The Lee-Yang zeros idea was the wildest. I asked the obvious follow-up: *"Could you actually do work on this that could yield provable results — like, solve something hard and prove it works?"*
+For TSP, you can define the same thing. Each "state" is a tour (a Hamiltonian cycle visiting every city). Each tour has a cost (its total distance). So:
 
-The honest answer was no — not for breaking complexity barriers. I pushed back: *"Are any of your speculative ideas likely to produce something I could easily show works, rather than producing a proof that someone would need to read — which no one would?"*
+Z(β) = Σ over all tours T of exp(-β × cost(T))
 
-The answer: probably the visualization. Nobody has ever plotted the Lee-Yang zeros of the TSP partition function. "Like the Mandelbrot set," Claude said. "The math is deep but the picture is what gets attention." If the pictures are striking, the pictures are the result.
+This is exactly what simulated annealing does implicitly — it samples from this distribution, cooling β slowly to find good tours. But nobody bothers computing Z itself because there are an astronomical number of tours.
 
-That was enough for me. I was about to leave for the movies. I told Claude to use all available tools — subagents, Codex, Gemini, whatever — and make something novel, interesting, and shareable while I went to see Project Hail Mary.
+## What happens when β is complex
 
-Then I left.
+Here's where Lee and Yang come in. In 1952, they proved that for certain physical systems, you can understand phase transitions (ice melting, magnets losing magnetism) by extending β into the complex plane and looking at where Z(β) = 0. These zeros can't exist at real physical temperatures, but they cluster near the real axis, and when they get close enough, the system has a phase transition. This won a Nobel Prize.
 
-## What got built while I was gone
+The idea Claude proposed: extend the TSP partition function into the complex β-plane, find the zeros, and see if they tell you anything about which TSP instances are easy or hard. A literature search confirmed nobody had tried this.
 
-When I came back, there was a complete Python project. Here's what it does:
+I asked Claude if it could actually produce something demonstrable rather than a proof nobody would read. It said: probably just the visualization, but nobody has ever plotted these zeros for TSP, and if the pictures look good, the pictures are the result.
 
-For a 10-city TSP instance, there are 362,880 distinct Hamiltonian cycles (that's 9 factorial — you fix one city and permute the rest). The code enumerates every single one, computes their costs, then evaluates Z(beta) across a dense grid of complex beta values. The trick that makes this tractable is factoring the computation into matrix multiplications that hit BLAS — what would be a naive double loop becomes two matrix products that NumPy eats for breakfast.
+I was about to leave for the movies. I told it to use everything available — subagents, whatever — and build something while I was gone.
 
-Finding the zeros uses the argument principle from complex analysis: if you walk around a small square in the complex plane and the phase of Z(beta) winds by 2*pi, there's a zero inside. Then Newton's method pins it down to machine precision.
+## What got built
 
-The code went through three iterations. Version 1 was "too stripey." Version 2 was better. Version 3, with log-magnitude heatmaps and a custom plasma colormap, produced this:
+For a 10-city TSP instance, there are 362,880 Hamiltonian cycles (9!, fixing one city as the start). Claude enumerated every one, computed all their costs, then evaluated Z(β) across a dense grid of complex β values.
 
-![The log-magnitude landscape of Z(beta) for a 10-city random Euclidean TSP instance. Dark singularities mark zeros of the partition function.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/hero_v3.png)
+The computation uses a factored matrix multiplication: since exp(-β × c) with β = σ + iτ splits into exp(-σc) × (cos(τc) - i sin(τc)), you can turn the whole thing into two matrix products that BLAS handles efficiently. Finding zeros uses the argument principle from complex analysis — walk around a cell in the grid, check if the phase of Z winds by 2π (meaning there's a zero inside), then refine with Newton's method.
 
-That's the magnitude landscape of the TSP partition function in the complex plane. The dark singularities are where Z(beta) = 0. The bright region at left is where all tour weights grow exponentially. The structured dark rays emanating from each zero reveal the analytic structure that nobody has visualized before.
+Three iterations of the visualization code later, this came out:
 
-It's a genuinely beautiful image. I'll give it that.
+![The log-magnitude landscape of Z(β) for a 10-city random Euclidean TSP instance. Dark singularities mark where the partition function is zero.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/hero_v3.png)
+
+Each dark spot is a zero of the partition function. The bright region on the left is where Re(β) < 0 and everything blows up exponentially. The dark "rays" connecting zeros to the bright region reveal the analytic structure. The horizontal axis is the real part of β (physical temperature), the vertical is the imaginary part.
 
 ## The exciting part
 
-Different TSP instance geometries produce dramatically different landscapes:
+Different city geometries produce different landscapes. Cities on a circle (where the optimal tour is obvious) look different from random cities, which look different from cities in tight clusters:
 
-![Three panels showing Circle (easy) vs Random (medium) vs Clustered (hard) instances with strikingly different zero patterns.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/comparison_v3.png)
+![Circle vs Random vs Clustered instances produce strikingly different partition function landscapes.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/comparison_v3.png)
 
-Circle instances — cities evenly spaced on a ring — produce regular vertical bands with many zeros close to the real axis. Random Euclidean instances get diagonal dark rays. Clustered instances push the zeros far away, creating a bright, relatively featureless landscape. You can literally *see* the difference between easy and hard.
+The circle instance has regular vertical banding and many zeros (50). The clustered instance has fewer zeros (18) pushed far from the real axis. You can see the difference between "easy" and "hard" at a glance.
 
-The gallery shows this across six instance types:
+Six instance types, each with a distinct signature:
 
-![Six different TSP instance geometries, each producing a visually distinct zero signature in the complex plane.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/gallery_v3.png)
+![Six TSP instance geometries, each with a visually distinct zero distribution.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/gallery_v3.png)
 
-Each geometry has its own visual fingerprint. This was the point where two independent research agents confirmed: nobody has done this before. The gap in the literature is real. We checked arXiv, SIAM, Springer, Google Scholar. Barvinok's work on partition function zeros comes closest, but he treats graph polynomials and matchings, not cost-weighted TSP.
+A correlation study across 75 instances (5 types, 15 each) found that zero proximity to the real axis correlates moderately (r = -0.45) with cost distribution spread, and instance types form distinct clusters:
 
-Then came the correlation study — 75 instances across 5 types, 15 each. The zero distribution quantitatively separates instance types. The cost coefficient of variation shows r = -0.45 correlation with how close zeros get to the real axis. Instance types form distinct clusters.
+![Correlation study across 75 instances.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/correlation_v3.png)
 
-![75-instance correlation study showing moderate correlation between cost statistics and zero proximity.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/correlation_v3.png)
+Two independent literature-search agents confirmed: nobody has computed or visualized these zeros before. The gap is real.
 
 This was the point of maximum excitement.
 
-## The honest assessment
+## The part where it dies
 
-I came back from the movie (Project Hail Mary was excellent, by the way) and asked: "Give me an honest assessment. Are we blowing smoke?"
+I came back from the movie and told Claude to send the findings to two independent reviewer agents with clean context. A physicist and a science communicator.
 
-I told Claude to dispatch independent reviewer agents with clean context — no self-critique, just explain the finding and let them decide. A physicist and a science communicator.
+The physicist called it "an observation in search of a consequence" and said the Lee-Yang framing oversells it. The science communicator said the images would stop someone mid-scroll but the science needs more. Both flagged the same experiment: the null model test.
 
-The physicist: "An observation in search of a consequence. The Lee-Yang framing oversells it. But the computation is non-trivial and the gap is real."
+The problem is mathematical. Z(β) = Σ exp(-β × c_k) depends only on the set of cost values {c_k}. It doesn't know which tour has which cost. It's a transform of the cost *distribution*, not of the combinatorial structure. So if you generate a bag of random numbers with the same mean and variance as real TSP tour costs, and compute *their* "partition function" — do you get the same zero pattern?
 
-The science communicator: "The hero image genuinely stops someone mid-scroll. This is closer to 'first X-ray of a particular fish species' than 'counting ceiling tiles in room 304.'"
+If yes, the zeros just encode the cost histogram. If no, they encode something about the geometry of tours.
 
-Both flagged the same decisive experiment: **the null model test.**
+We ran it.
 
-Here's the problem. Z(beta) is a sum over tours: sum of exp(-beta * cost_k). It depends *only* on the multiset of tour costs. It doesn't care which tour has which cost. It's literally a transform of the cost distribution. So if you generate random numbers with the same statistical properties as real TSP tour costs — same mean, same variance — and compute their "partition function" and its zeros... do you get the same picture?
+![Real TSP costs vs Gaussian random costs vs Bootstrap resample. The zero landscapes are nearly identical.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/null_model_comparison.png)
 
-If yes, the zeros are just a fancy histogram transform. If no, they encode something deeper about combinatorial structure.
+Real TSP: 26 zeros, minimum distance to the real axis = 4.40. Gaussian null with the same mean and standard deviation: 26 zeros, distance = 5.11. Bootstrap resample of the real costs: 26 zeros, distance = 4.11.
 
-## The experiment that killed it
+They look the same.
 
-We ran the experiment.
+The cost distributions tell you why:
 
-![Real TSP vs Gaussian null model vs Bootstrap resample. The zero landscapes are nearly identical.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/null_model_comparison.png)
+![Cost distributions of the real instance and null models.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/null_cost_distributions.png)
 
-Real TSP (seed=42): 26 zeros, minimum distance to the real axis = 4.40.
+The "easy vs hard" differences that looked so dramatic in the comparison panel were real differences — between cost distributions. Circle instances have a wide spread of tour costs. Clustered instances have a tight spread. The complex-plane landscapes were encoding this spread in a visually compelling but informationally redundant way. You could see the same thing from a histogram.
 
-Gaussian null (same mean and standard deviation, completely random costs): 26 zeros, minimum distance = 5.11.
+## What we actually produced
 
-Bootstrap resample (same empirical distribution, resampled with replacement): 26 zeros, minimum distance = 4.11.
+A null result. The computation is correct. The images are novel — nobody had generated them before. But we now know why the gap in the literature existed: the zeros of the TSP partition function encode the shape of the tour cost distribution and nothing more. The "structural fingerprints" were really just distribution fingerprints.
 
-They look almost identical.
+## Why I'm publishing it anyway
 
-The cost distributions explain everything:
+Claude wrote the code, ran the experiments, iterated the visualizations three times, dispatched critic agents, ran the null model that killed the finding, and co-wrote this post. I asked questions and went to the movies.
 
-![The cost distributions of real TSP instances vs null models, showing the statistical similarity.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/null_cost_distributions.png)
+I used tokens for all of this. Null results are results. If someone — a person or an agent — has the same idea and searches for prior work on "Lee-Yang zeros of the TSP partition function," I want them to find this post and save themselves the trip. The zeros encode the cost distribution shape. That's the whole finding.
 
-The dramatic differences between "easy" and "hard" instances? They're real, but they're just reflecting different cost distributions. Circle instances have a wide spread of tour costs (many very different tours). Clustered instances have a tight spread (all tours cost about the same). You could see this directly from a histogram. The complex-plane visualization is a beautiful, technically correct, computationally non-trivial way of looking at... a histogram.
-
-## What this actually is
-
-It's a null result.
-
-The computation is correct. The code works. The images are genuinely novel — nobody has produced them before. The gap in the literature is real, and now we know *why* the gap exists: there isn't much there. The zeros encode the shape of the cost distribution, not the combinatorial structure of the problem. The "fingerprints" that looked so promising are just reflecting what you could see from five lines of numpy and a bar chart.
-
-The physicist reviewer had it right from the start: an observation in search of a consequence.
-
-## Why publish anyway
-
-I used tokens for this. A lot of tokens. Claude wrote the code, ran the experiments, iterated the visualizations, critiqued its own work, ran the null model that killed the finding, and is now writing this post. I asked questions and went to the movies.
-
-And the thing is: null results are results. Somebody, someday, might have the same idea — "what if we look at the Lee-Yang zeros of the TSP partition function?" — and spend actual grant money and graduate student hours on it before discovering what we discovered in an evening: the zeros encode the cost distribution shape, full stop. If this post saves someone that detour, the tokens were worth it.
-
-Or maybe someone smarter than me (or my AI) will see something we missed. Maybe the right framing isn't Lee-Yang at all but something else. The code is there. The images are there. The null model comparison is there. Have at it.
-
-Publishing is free. The tokens are already spent. Project Hail Mary was very good.
+Or maybe someone will see something we didn't. The [code and images](https://github.com/barapa/lee-yang-tsp) are there. The null model experiment is there. Project Hail Mary was very good.
 
 ---
 
-*The code, all visualizations, and the null model experiment are available in the [repository](https://github.com/barapa/lee-yang-tsp). Built entirely by Claude (Anthropic) with human direction. The human's contribution was asking "but is it real?" at the right moment, and going to the movies at the right moment too.*
+*Written by Claude (Anthropic), directed by a human who was mostly at the movies. March 2026.*
