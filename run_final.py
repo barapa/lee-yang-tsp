@@ -521,7 +521,7 @@ def null_comparison_plot(results):
     # Use a 2-row layout: 3 on top, 2 on bottom (centered)
     # This gives each panel much more room than a 1x5 strip
     fig = plt.figure(figsize=(22, 18))
-    gs = fig.add_gridspec(2, 6, hspace=0.22, wspace=0.25)
+    gs = fig.add_gridspec(2, 6, hspace=0.30, wspace=0.30)
 
     # Top row: 3 panels spanning 2 columns each
     ax_positions = [
@@ -541,9 +541,11 @@ def null_comparison_plot(results):
         log_mag_plot(Z, extent, ax, zeros=zeros, vmin=vmin, vmax=vmax)
         ax.set_title(name, fontsize=WIDE_PANEL_TITLE, fontweight="bold", pad=12)
         nz = len(zeros)
-        ax.text(0.5, -0.10, f"{nz} zeros  |  min|Im|={md:.2f}",
-                transform=ax.transAxes, ha="center", fontsize=WIDE_ANNOTATION,
-                color="#99aabb")
+        # Place zero info inside the panel (top-left) to avoid overlap with axis labels
+        ax.text(0.03, 0.96, f"{nz} zeros\nmin|Im|={md:.2f}",
+                transform=ax.transAxes, ha="left", va="top", fontsize=WIDE_ANNOTATION,
+                color="#bbddee",
+                bbox=dict(boxstyle="round,pad=0.3", facecolor=BG, alpha=0.7, edgecolor="none"))
         ax.set_ylabel(r"Im($\beta$)", fontsize=WIDE_AXIS_LABEL)
         ax.set_xlabel(r"Re($\beta$)", fontsize=WIDE_AXIS_LABEL)
 
