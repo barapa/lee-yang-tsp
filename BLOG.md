@@ -40,7 +40,7 @@ Finding the zeros uses the argument principle from complex analysis: if you walk
 
 The code went through three iterations. Version 1 was "too stripey." Version 2 was better. Version 3, with log-magnitude heatmaps and a custom plasma colormap, produced this:
 
-![The log-magnitude landscape of Z(beta) for a 10-city random Euclidean TSP instance. Dark singularities mark zeros of the partition function.](output/hero_v3.png)
+![The log-magnitude landscape of Z(beta) for a 10-city random Euclidean TSP instance. Dark singularities mark zeros of the partition function.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/hero_v3.png)
 
 That's the magnitude landscape of the TSP partition function in the complex plane. The dark singularities are where Z(beta) = 0. The bright region at left is where all tour weights grow exponentially. The structured dark rays emanating from each zero reveal the analytic structure that nobody has visualized before.
 
@@ -50,19 +50,19 @@ It's a genuinely beautiful image. I'll give it that.
 
 Different TSP instance geometries produce dramatically different landscapes:
 
-![Three panels showing Circle (easy) vs Random (medium) vs Clustered (hard) instances with strikingly different zero patterns.](output/comparison_v3.png)
+![Three panels showing Circle (easy) vs Random (medium) vs Clustered (hard) instances with strikingly different zero patterns.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/comparison_v3.png)
 
 Circle instances — cities evenly spaced on a ring — produce regular vertical bands with many zeros close to the real axis. Random Euclidean instances get diagonal dark rays. Clustered instances push the zeros far away, creating a bright, relatively featureless landscape. You can literally *see* the difference between easy and hard.
 
 The gallery shows this across six instance types:
 
-![Six different TSP instance geometries, each producing a visually distinct zero signature in the complex plane.](output/gallery_v3.png)
+![Six different TSP instance geometries, each producing a visually distinct zero signature in the complex plane.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/gallery_v3.png)
 
 Each geometry has its own visual fingerprint. This was the point where two independent research agents confirmed: nobody has done this before. The gap in the literature is real. We checked arXiv, SIAM, Springer, Google Scholar. Barvinok's work on partition function zeros comes closest, but he treats graph polynomials and matchings, not cost-weighted TSP.
 
 Then came the correlation study — 75 instances across 5 types, 15 each. The zero distribution quantitatively separates instance types. The cost coefficient of variation shows r = -0.45 correlation with how close zeros get to the real axis. Instance types form distinct clusters.
 
-![75-instance correlation study showing moderate correlation between cost statistics and zero proximity.](output/correlation_v3.png)
+![75-instance correlation study showing moderate correlation between cost statistics and zero proximity.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/correlation_v3.png)
 
 This was the point of maximum excitement.
 
@@ -86,7 +86,7 @@ If yes, the zeros are just a fancy histogram transform. If no, they encode somet
 
 We ran the experiment.
 
-![Real TSP vs Gaussian null model vs Bootstrap resample. The zero landscapes are nearly identical.](output/null_model_comparison.png)
+![Real TSP vs Gaussian null model vs Bootstrap resample. The zero landscapes are nearly identical.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/null_model_comparison.png)
 
 Real TSP (seed=42): 26 zeros, minimum distance to the real axis = 4.40.
 
@@ -98,7 +98,7 @@ They look almost identical.
 
 The cost distributions explain everything:
 
-![The cost distributions of real TSP instances vs null models, showing the statistical similarity.](output/null_cost_distributions.png)
+![The cost distributions of real TSP instances vs null models, showing the statistical similarity.](https://raw.githubusercontent.com/barapa/lee-yang-tsp/main/output/null_cost_distributions.png)
 
 The dramatic differences between "easy" and "hard" instances? They're real, but they're just reflecting different cost distributions. Circle instances have a wide spread of tour costs (many very different tours). Clustered instances have a tight spread (all tours cost about the same). You could see this directly from a histogram. The complex-plane visualization is a beautiful, technically correct, computationally non-trivial way of looking at... a histogram.
 
@@ -122,4 +122,4 @@ Publishing is free. The tokens are already spent. Project Hail Mary was very goo
 
 ---
 
-*The code, all visualizations, and the null model experiment are available in the [repository](https://github.com). Built entirely by Claude (Anthropic) with human direction. The human's contribution was asking "but is it real?" at the right moment, and going to the movies at the right moment too.*
+*The code, all visualizations, and the null model experiment are available in the [repository](https://github.com/barapa/lee-yang-tsp). Built entirely by Claude (Anthropic) with human direction. The human's contribution was asking "but is it real?" at the right moment, and going to the movies at the right moment too.*
